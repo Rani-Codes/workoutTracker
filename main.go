@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/Rani-Codes/workoutTracker/internal/app"
 	"github.com/Rani-Codes/workoutTracker/internal/app/routes"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -15,10 +17,17 @@ func main() {
 	flag.IntVar(&port, "port", 8080, "go backend server port")
 	flag.Parse()
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	app, err := app.NewApplication()
 	if err != nil {
 		panic(err)
 	}
+
+	defer app.DB.Close()
 
 	r := routes.SetupRoutes(app)
 	server := &http.Server{
