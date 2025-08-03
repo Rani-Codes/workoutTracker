@@ -9,6 +9,7 @@ import (
 
 	"github.com/Rani-Codes/workoutTracker/internal/api"
 	"github.com/Rani-Codes/workoutTracker/internal/store"
+	"github.com/Rani-Codes/workoutTracker/migrations"
 )
 
 type Application struct {
@@ -21,6 +22,11 @@ func NewApplication() (*Application, error) {
 	pgDB, err := store.Open()
 	if err != nil {
 		return nil, err
+	}
+
+	err = store.MigrateFS(pgDB, migrations.FS, ".")
+	if err != nil {
+		panic(err) //if db doesn't work, whole app fails
 	}
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
